@@ -1,4 +1,5 @@
 require("dotenv").config();
+import * as mongoose from "mongoose";
 import express from "express";
 import * as bodyParser from "body-parser";
 import { AppCreator } from "./interfaces/AppCreator";
@@ -13,6 +14,7 @@ export class App implements AppCreator {
 
   async initializeServer() {
     try{
+      this.connectWithDatabase()
         await this.loadMiddlewares()
         this.loadEndpoints()
         this.start()
@@ -30,7 +32,7 @@ export class App implements AppCreator {
 
   private async loadMiddlewares() {
     // parse application/json
-    this.app.use(bodyParser.json({ limit: "50mb" }));
+    this.app.use(bodyParser.json());
     // parse application/x-www-form-urlencoded
     this.app.use(bodyParser.urlencoded({ extended: false, limit: "50mb" }));
 
@@ -44,7 +46,7 @@ export class App implements AppCreator {
         "Access-Control-Allow-Methods",
         "PUT, POST, PATCH, GET, DELETE, OPTIONS"
       );
-      console.log(`${req.method} ${req.originalUrl} on ${new Date()}`)
+      console.log(`${req.method} ${req.originalUrl} (${new Date()})`)
 
       if ("OPTIONS" === req.method) {
         res.send(200);
@@ -54,10 +56,20 @@ export class App implements AppCreator {
     });
   }
 
-  private loadEndpoints(){
-    this.app.get('/', (req, res) => {
-        res.json({"result" : "Hello World!"})
+  private connectWithDatabase(){
+    const server = '127.0.0.1:27017'
+    const database = 'rateItUp'
+
+    mongoose.connect(`mongodb://${server}/${database}`)
+    .then(() => {
+        console.log('Database connection successfull')
+    }).catch((err:any) => {
+        console.log('Database connection error : ' + err)
     })
+  }
+
+  private loadEndpoints(){
+    this.app.use("/api/v1/users", require('./routes/v1/user.routes'))
   }
 
   private start() {
