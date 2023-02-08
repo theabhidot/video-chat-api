@@ -1,5 +1,5 @@
 require("dotenv").config();
-import * as mongoose from "mongoose";
+// import * as mongoose from "mongoose";
 import express from "express";
 import * as bodyParser from "body-parser";
 import { AppCreator } from "./interfaces/AppCreator";
@@ -14,7 +14,7 @@ export class App implements AppCreator {
 
   async initializeServer() {
     try{
-      this.connectWithDatabase()
+      // this.connectWithDatabase()
         await this.loadMiddlewares()
         this.loadEndpoints()
         this.start()
@@ -56,20 +56,20 @@ export class App implements AppCreator {
     });
   }
 
-  private connectWithDatabase(){
-    const server = '127.0.0.1:27017'
-    const database = 'rateItUp'
+  // private connectWithDatabase(){
+  //   const server = '127.0.0.1:27017'
+  //   const database = 'rateItUp'
 
-    mongoose.connect(`mongodb://${server}/${database}`)
-    .then(() => {
-        console.log('Database connection successfull')
-    }).catch((err:any) => {
-        console.log('Database connection error : ' + err)
-    })
-  }
+  //   mongoose.connect(`mongodb://${server}/${database}`)
+  //   .then(() => {
+  //       console.log('Database connection successfull')
+  //   }).catch((err:any) => {
+  //       console.log('Database connection error : ' + err)
+  //   })
+  // }
 
   private loadEndpoints(){
-    this.app.use("/api/v1/users", require('./routes/v1/user.routes'))
+    this.app.use("/api/v1/link", require('./routes/v1/link.routes'))
   }
 
   private start() {
